@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<!-- Provided by sleutene for convenience -->
+<launch>
+  <!-- Launch simulator. -->
+  <!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched -->
+  <include file="$(find sjtu_drone)/launch/simple.launch">
+    <arg name="world_name" value="$(find sjtu_drone)/worlds/skokloster_castle.world"/>
+    <!--arg name="world_name" value="$(find sjtu_drone)/worlds/garching_kitchen.world"/-->
+  </include>
+  
+  <!-- Emulate controller parameters-->
+  <group ns="ardrone_driver">
+    <param name="euler_angle_max" value="0.21" />
+    <param name="control_vz_max" value="700" />
+    <param name="control_yaw" value="1.75" />
+  </group>
+  
+  <!-- Launch visualisation. -->
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find rmil_drone_practicals)/config/rviz_control.rviz"/>
+  <!-- Launch estimator / control arp_node. -->
+  <node name="rmil_drone_node" pkg="rmil_drone_practicals" type="rmil_drone_node"
+      output="screen">
+    <remap from="ardrone/front/image_raw" to="drone/front_camera/image_raw"/>
+    <remap from="ardrone/imu" to="drone/imu"/> 
+    <remap from="ardrone/takeoff" to="drone/takeoff"/> 
+    <remap from="ardrone/reset" to="drone/reset"/>
+    <remap from="ardrone/land" to="drone/land"/> 
+    <remap from="ardrone/navdata" to="drone/navdata"/> 
+    <!-- Camera parameters-->
+    <param name="fu" value="185.6909" />
+    <param name="fv" value="185.6909" />
+    <param name="cu" value="319.5" />
+    <param name="cv" value="179." />
+    <param name="k1" value="0" />
+    <param name="k2" value="0" />
+    <param name="p1" value="0" />
+    <param name="p2" value="0" />
+    <param name="focalLengthMap" value="185.6909" />
+    <rosparam param="T_SC">[0.0, 0.0, 1.0, 0.2, -1.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0]</rosparam>
+    <!-- Make sure to match the map to the world loaded above! -->
+    <param name="map" value="okvis2-map_skokloster.csv" />
+    <param name="occupancymap" value="occupancy-map_skokloster.dat" />
+    <!--param name="occupancymap" value="occupancy-map_garching.dat" /-->
+    <!-- Frontend -->
+    <param name="briskMatchingThreshold" value="60" />
+    <param name="briskUniformityRadius" value="25.0" />
+    <param name="briskOctaves" value="0" />
+    <param name="briskAbsoluteThreshold" value="10.0" />
+    <param name="briskMaxNumKeypoints" value="2000" />
+    <param name="reprojectionDistanceThreshold" value="5.0" />
+
+  </node>
+
+  <!-- Leader node  -->
+  <node name="leader" pkg="rmil_drone_practicals" type="leader_node" output="screen" />
+
+</launch>

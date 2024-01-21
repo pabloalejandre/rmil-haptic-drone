@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<!-- Provided by sleutene for convenience -->
+<launch>
+  <!-- IPv4 address of your drone -->
+  <arg name="ip" default="192.168.1.1" />
+  <!-- Ultrasound frequency (7 or 8). -->
+  <arg name="freq" default="8" />
+  <!-- Launch ardrone_driver. -->
+  <node name="ardrone_driver" pkg="ardrone_autonomy" type="ardrone_driver"
+      output="screen" clear_params="true" args="-ip $(arg ip)">
+    <param name="outdoor" value="0" />
+    <param name="max_bitrate" value="4000" />
+    <param name="bitrate" value="4000" />
+    <param name="navdata_demo" value="0" />
+    <param name="flight_without_shell" value="0" />
+    <param name="altitude_max" value="1600" />
+    <param name="altitude_min" value="50" />
+    <param name="euler_angle_max" value="0.21" />
+    <param name="control_vz_max" value="700" />
+    <param name="control_yaw" value="1.75" />
+    <param name="detect_type" value="10" />
+    <param name="enemy_colors" value="3" />
+    <param name="detections_select_h" value="32" />
+    <param name="detections_select_v_hsync" value="128" />
+    <param name="enemy_without_shell" value="0" />
+    <param name="ultrasound_freq" value="$(arg freq)" />
+    <param name="realtime_navdata" value="true" />
+    <param name="realtime_video" value="true" />
+    <!-- Covariance Values (3x3 matrices reshaped to 1x9)-->
+    <rosparam param="cov/imu_la">[0.1, 0.0, 0.0, 0.0, 0.1, 0.0, 0.0, 0.0, 0.1]</rosparam>
+    <rosparam param="cov/imu_av">[1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]</rosparam>
+    <rosparam param="cov/imu_or">[1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 100000.0]</rosparam>
+  </node>
+  <!-- Launch visualisation. -->
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find rmil_drone_practicals)/config/rviz_control.rviz"/>
+  <!-- Launch estimator / control arp_node. -->
+  <node name="rmil_drone_node" pkg="rmil_drone_practicals" type="rmil_drone_node" output="screen">
+    
+    <!-- Camera parameters-->
+    <param name="fu" value="582.13726" />
+    <param name="fv" value="579.40778" />
+    <param name="cu" value="315.61947" />
+    <param name="cv" value="205.41823" />
+    <param name="k1" value="-0.563809" />
+    <param name="k2" value="0.362871" />
+    <param name="p1" value="-0.011535" />
+    <param name="p2" value="-0.001087" />
+    <param name="focalLengthMap" value="390.598" />
+    <rosparam param="T_SC">[-0.00195087, -0.03257782,  0.99946730, 0.17409445, -0.99962338, -0.02729525, -0.00284087, 0.02255834, 0.02737326, -0.99909642, -0.03251230, 0.00174723, 0.00000000,  0.00000000,  0.00000000, 1.00000000]</rosparam>
+    <!-- Make sure to load the right map! -->
+    <param name="map" value="okvis2-map_rmil_arena_06_06_23.csv" />
+    <param name="occupancymap" value="occupancy-map_rmil_arena_06_06_23.dat" />
+    <!-- Frontend -->
+    <param name="briskMatchingThreshold" value="60" />
+    <param name="briskUniformityRadius" value="25.0" />
+    <param name="briskOctaves" value="0" />
+    <param name="briskAbsoluteThreshold" value="50.0" />
+    <param name="briskMaxNumKeypoints" value="1000" />
+    <param name="reprojectionDistanceThreshold" value="5.0" />
+
+  </node>
+
+</launch>
